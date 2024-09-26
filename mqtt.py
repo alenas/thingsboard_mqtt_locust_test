@@ -8,34 +8,31 @@ import json
 
 # Define a TaskSet for publishing MQTT messages
 class PublishTask(TaskSet):
-    def on_start(self):
-        self.client.connect(host=broker_address, port=1883, keepalive=60)
-        self.client.disconnect()
+    generator = PayloadGenerator()
 
     @task(1)
     def task_pub(self):
         self.client.reconnect()
-        self.client.loop_start()
-        self.start_time = time.time()
+        #self.client.loop_start()
 
-        generator = PayloadGenerator()
-        payload = json.dumps(generator.next())
+        #generator = PayloadGenerator()
+        payload = json.dumps(self.generator.next())
+        print(f'This is the {payload}')
 
-        #print(f'This is the {payload}')
-
+        start_time = time.time()
         # Publish the MQTT message and record relevant information
         MQTTMessageInfo = self.client.publish(topic, payload, qos=qos, retain=False)
         pub_mid = MQTTMessageInfo.mid
         print(str(self.client._client_id) + "Mid = " + str(pub_mid))
         self.client.pubmessage[pub_mid] = Message(
-            REQUEST_TYPE, qos, topic, payload, self.start_time, PUBLISH_TIMEOUT, str(self.client._client_id)
+            REQUEST_TYPE, qos, topic, payload, start_time, PUBLISH_TIMEOUT, str(self.client._client_id)
         )
         MQTTMessageInfo.wait_for_publish()
-        self.client.disconnect()
-        self.client.loop_stop()
+
+        #self.client.disconnect()
+        #self.client.loop_stop()
         #time.sleep(.1)
 
-    #wait_time = between(0.5, 10)
 
 
 # Initialize a global variable to keep track of MQTT client count
@@ -65,34 +62,85 @@ class Message(object):
 
 # Define the MQTTLocust user class
 class MQTTLocust(User):
-    tasks = {PublishTask}
+    generator = PayloadGenerator()
+    #tasks = [PublishTask]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         client_id = device_tokens[COUNTClient]
         increment()
+        print("User: " + client_id)
+
         self.client = mqtt.Client(client_id=client_id, callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
         self.client.username_pw_set(username=client_id)
         #self.client.on_connect = self.on_connect
         #self.client.on_disconnect = self.on_disconnect
         self.client.on_publish = self.on_publish
         self.client.pubmessage = {}
+        print("init finished")
+        #client.connect(host=broker_address, port=1883, keepalive=60)
+        #client.disconnect()
 
     def on_start(self):
-        PublishTask.topic = topic
+        # client_id = device_tokens[COUNTClient]
+        # increment()
+        # print("Client: " + client_id)
+
+        # client = mqtt.Client(client_id=client_id, callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
+        # client.username_pw_set(username=client_id)
+        # client.on_connect = self.on_connect
+        # client.on_disconnect = self.on_disconnect
+        # client.on_publish = self.on_publish
+        # client.pubmessage = {}
+        print("Connecting to broker")
+        self.client.connect(host=broker_address, port=1883, keepalive=60)
+        self.client.disconnect()
+
+        print("loop started")
+        #self.client.disconnect()
+
+    @task
+    def publish(self):
+        if self.client.is_connected() == False:
+            print("Reconnecting")
+            self.client.reconnect()
+            #self.client.connect(host=broker_address, port=1883, keepalive=60)
+            self.client.loop_start()
+
+        print("Publishing task")
+        #generator = PayloadGenerator()
+        payload = json.dumps(self.generator.next())
+        #print(f'This is the {payload}')
+
+        start_time = time.time()
+        # Publish the MQTT message and record relevant information
+        MQTTMessageInfo = self.client.publish(topic, payload, qos=qos, retain=False)
+        pub_mid = MQTTMessageInfo.mid
+        print(str(self.client._client_id) + "Mid = " + str(pub_mid))
+        self.client.pubmessage[pub_mid] = Message(
+            REQUEST_TYPE, qos, topic, payload, start_time, PUBLISH_TIMEOUT, str(self.client._client_id)
+        )
+        MQTTMessageInfo.wait_for_publish()
+
+
+    def on_stop(self):
+        self.client.disconnect()
+        self.client.loop_stop()
+        print("loop stopped")
 
 	# client, userdata, flags, reason_code, properties
     def on_connect(self, client, userdata, flags, rc, props=None):
-        events.request.fire(
-            request_type=REQUEST_TYPE,
-            name='connect',
-            response_time=0,
-            response_length=0
-        )
+        print("Connected with result code: " + str(rc))
+        # events.request.fire(
+        #     request_type=REQUEST_TYPE,
+        #     name='connect',
+        #     response_time=0,
+        #     response_length=0
+        # )
 
     # disconnect_callback(client, userdata, disconnect_flags, reason_code, properties)
-    #def on_disconnect(self, client, userdata, flags, rc, props=None):
-    #    print("Disconnected result code " + str(rc))
+    def on_disconnect(self, client, userdata, flags, rc, props=None):
+        print("Disconnected result code: " + str(rc))
 
     # publish_callback(client, userdata, mid, reason_code, properties)
     def on_publish(self, client, userdata, mid, rc, props=None):
