@@ -49,8 +49,6 @@ class MQTTLocust(User):
         self.client.on_disconnect = self.on_disconnect
         self.client.on_publish = self.on_publish
         self.client.user_data_set(self.unacked_publish)
-        # self.client.connect(host=tb_address, port=tb_port, keepalive=60)
-        # self.client.loop_start()
 
     def on_start(self):
         self.client.connect(host=tb_address, port=tb_port, keepalive=60)
@@ -59,7 +57,7 @@ class MQTTLocust(User):
     @task
     def publish(self):
         if self.client.is_connected() == False:
-            print(str(self.client_id) + " >> Reconnecting")
+            #print(str(self.client_id) + " >> Reconnecting")
             self.client.reconnect()
             self.client.loop_start()
 
@@ -75,7 +73,8 @@ class MQTTLocust(User):
         while len(self.unacked_publish):
             time.sleep(0.01)
 
-        MQTTMessageInfo.wait_for_publish()
+        if mqtt_qos > 0:
+            MQTTMessageInfo.wait_for_publish()
 
 
     def on_stop(self):
