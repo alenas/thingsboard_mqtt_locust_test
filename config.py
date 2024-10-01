@@ -1,9 +1,8 @@
 # Device tokens - there should be at least one
-device_tokens = ["demo1lptrk1"]
-#["dy6it7odoopo2cutmu1x"]
+device_tokens = ["",""]
 
 # Define the MQTT broker address
-tb_address = "age.dev.telemetrak.net" # "3.teststack.telemetrak.net"
+tb_address = "age.dev.telemetrak.net"
 tb_port = 1883
 
 # Define the MQTT topic to subscribe to

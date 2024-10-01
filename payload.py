@@ -23,13 +23,13 @@ class PayloadGenerator:
         lat, lng = self.__getData()
 
         payload = {
-            "ts": int(time.time()),
+            "ts": int(time.time() * 1000),
             "values": {
-                "alt": 1.0,
-                "crs": 0.0,
+                "alt": 10.0,
+                "crs": 45.0,
                 "lat": lat,
                 "lon": lng,
-                "spd": 0.0,
+                "spd": 1.0,
             }
         }
         return payload
