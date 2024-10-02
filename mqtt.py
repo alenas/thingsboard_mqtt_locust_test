@@ -2,8 +2,9 @@ import paho.mqtt.client as mqtt
 from locust import User, events, TaskSet, task, run_single_user
 import time
 
-from config import REQUEST_TYPE, mqtt_topic, mqtt_qos, device_tokens, tb_address, tb_port, PUBLISH_TIMEOUT
+from config import REQUEST_TYPE, mqtt_topic, mqtt_qos, tb_address, tb_port, PUBLISH_TIMEOUT
 from payload import PayloadGenerator
+from credentials import device_tokens
 import json
 
 # Initialize a global variable to keep track of MQTT client count
