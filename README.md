@@ -1,17 +1,17 @@
-# MQTT Locust Load Testing Script Documentation
+# ThingsBoard MQTT Locust Load Testing Script Documentation
 
 ## Introduction
 
-The "mqtt_locust_test.py" script is a Python program designed to perform load testing on MQTT (Message Queuing Telemetry Transport) brokers using the Locust load testing framework. This script simulates multiple MQTT clients publishing messages to a broker and measures the performance of the broker under load.
+The "mqtt.py" script is a Python program designed to perform load testing on ThingsBoard MQTT (Message Queuing Telemetry Transport) brokers using the Locust load testing framework. This script simulates multiple MQTT clients publishing messages to a broker and measures the performance of the broker under load.
 
 ## Table of Contents
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. [Configuration](#configuration)
-4. [Script Structure](#script-structure)
-5. [Customization](#customization)
-6. [Running the Tests](#running-the-tests)
+3. [MQTT configuration](#configuration)
+4. [Locust configuration](#locust)
+5. [Script Structure](#script-structure)
+6. [Customization](#customization)
 7. [Results and Reporting](#results-and-reporting)
 8. [Example Scenario](#example-scenario)
 9. [Troubleshooting](#troubleshooting)
@@ -21,23 +21,43 @@ The "mqtt_locust_test.py" script is a Python program designed to perform load te
 ## Installation <a name="installation"></a>
 
 - Clone or download the script from the GitHub repository.
-
+- Ensure you have Python 3.x installed on your system.
 - Install the required Python libraries using pip:
 
-   ```bash
-   pip install locust paho-mqtt
+```bash
+pip install -r requirement.txt
+```
+
+or
+
+```bash
+pip install locust paho-mqtt
+```
 
 
-Ensure you have Python 3.x installed on your system.
-Usage <a name="usage"></a>
+## Usage <a name="usage"></a>
+
 To use the script, follow these steps:
 
 Open a terminal or command prompt.
 
-Navigate to the directory containing the "mqtt_locust_test.py" script.
+Navigate to the directory containing the "mqtt.py" script.
+
+Run locust with configuration stored in "pyproject.toml":
+
+```bash
+locust
+```
+
+or
 
 Run the script with the desired command-line arguments. For example:
-locust -f mqtt_locust_test.py --topic "my/topic"
+
+```bash
+locust -f mqtt.py --headless --users 10 --spawn-rate 1
+```
+
+or 
 
 Open a web browser and navigate to the Locust web interface (by default, it's http://localhost:8089).
 
@@ -45,61 +65,41 @@ Configure the number of users (clients) and the hatch rate for your load test.
 
 Start the load test from the web interface.
 
-Certainly! Here's the documentation you provided formatted for a GitHub README file:
+## MQTT Configuration <a name="configuration"></a>
 
-markdown
-Copy code
-# MQTT Locust Load Testing Script Documentation
+MQTT connection configuration is stored in "config.py"
+```
+# Device tokens - there should be at least one
+device_tokens = ["tb_access_token"]
 
-## Introduction
+# Define the MQTT broker address and port
+tb_address = "your.server.com"
+tb_port = 1883
 
-The "mqtt_locust_test.py" script is a Python program designed to perform load testing on MQTT (Message Queuing Telemetry Transport) brokers using the Locust load testing framework. This script simulates multiple MQTT clients publishing messages to a broker and measures the performance of the broker under load.
+# Define the MQTT topic and QoS to subscribe to
+mqtt_topic = "v1/lptrk/gps"
+mqtt_qos = 1
 
-## Table of Contents
+# Define constants for request type and publish timeout
+REQUEST_TYPE = 'MQTT'
+PUBLISH_TIMEOUT = 10000
+```
 
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Configuration](#configuration)
-4. [Script Structure](#script-structure)
-5. [Customization](#customization)
-6. [Running the Tests](#running-the-tests)
-7. [Results and Reporting](#results-and-reporting)
-8. [Example Scenario](#example-scenario)
-9. [Troubleshooting](#troubleshooting)
-10. [Contributing](#contributing)
-11. [License](#license)
+## Locust configuration <a name="locust"></a>
 
-## Installation <a name="installation"></a>
+Locust configuration is stored in "pyproject.toml"
 
-- Clone or download the script from the GitHub repository.
+```
+[tool.locust]
+locustfile = "mqtt.py"
+headless = true
+expect-workers = 1
+spawn-rate = 1
+run-time = "1m"
+only-summary = 1
+```
 
-- Install the required Python libraries using pip:
-
-   ```bash
-   pip install locust paho-mqtt
-Ensure you have Python 3.x installed on your system.
-Usage <a name="usage"></a>
-To use the script, follow these steps:
-
-Open a terminal or command prompt.
-
-Navigate to the directory containing the "mqtt_locust_test.py" script.
-
-Run the script with the desired command-line arguments. For example:
-
-bash
-Copy code
-locust -f mqtt_locust_test.py --topic "my/topic"
-Open a web browser and navigate to the Locust web interface (by default, it's http://localhost:8089).
-
-Configure the number of users (clients) and the hatch rate for your load test.
-
-Start the load test from the web interface.
-
-Configuration <a name="configuration"></a>
-Command-Line Arguments
---topic: Specify the MQTT topic to which clients send messages.
-Script Structure <a name="script-structure"></a>
+## Script Structure <a name="script-structure"></a>
 The script is structured into several sections:
 
 Importing required libraries.
@@ -112,7 +112,9 @@ Creating the MQTTLocust class for load testing.
 Configuring Locust tasks.
 Handling MQTT connection, disconnection, and message publishing.
 Running the load test using Locust.
-Customization <a name="customization"></a>
+
+## Customization <a name="customization"></a>
+
 You can customize the script by modifying the following parameters:
 
 MQTT broker address (broker_address).
@@ -127,14 +129,15 @@ Configure the number of clients, hatch rate, and other test parameters via the L
 
 Start the test from the web interface, and the script will simulate MQTT clients publishing messages to the broker.
 
-Results and Reporting <a name="results-and-reporting"></a>
-Locust provides real-time performance metrics and reporting through its web interface.
+## Results and Reporting <a name="results-and-reporting"></a>
+
+Locust provides real-time performance metrics and reporting through its web interface or terminal output.
 
 You can view various statistics such as response times, request rates, and failures.
 
 Generate and save detailed reports for analysis.
 
-Example Scenario <a name="example-scenario"></a>
+## Example Scenario <a name="example-scenario"></a>
 Here's an example scenario:
 
 You want to test the performance of an MQTT broker under load.
@@ -149,11 +152,11 @@ The script sends MQTT messages to the broker, measuring response times and other
 
 You analyze the results to assess the broker's performance.
 
-Troubleshooting <a name="troubleshooting"></a>
-If you encounter issues, refer to the "Troubleshooting" section in the README file of the GitHub repository for this script.
-Contributing <a name="contributing"></a>
-Contributions to this script are welcome. Please fork the repository, make your changes, and submit a pull request.
-License <a name="license"></a>
-This script is released under the MIT License.
+## Troubleshooting <a name="troubleshooting"></a>
+* Did you set correct values in "config.py"? 
 
-You can copy and paste this content into your GitHub README file, and it will provide a comprehensive guide to users and potential contributors of your MQTT Locust Load Testing Script.
+## Contributing <a name="contributing"></a>
+Contributions to this script are welcome. Please fork the repository, make your changes, and submit a pull request.
+
+## License <a name="license"></a>
+This script is released under the MIT License.
