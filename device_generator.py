@@ -43,6 +43,7 @@ class ProvisionClient(Client):
     NUMBER_OF_DEVICES = 0
     CREDENTIALS = set()
     DEVICE_NAME = ""
+    IS_CONNECTED = False
 
     def __init__(self, config: Config):
         super().__init__(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
@@ -52,14 +53,20 @@ class ProvisionClient(Client):
         self._username = "provision" # do not change this, as it will not connect
         self.DEVICE_NAME = config.device_name
         self.on_connect = self.__on_connect
+        self.on_disconnect = self.__on_disconnect
         self.on_message = self.__on_message
         self.__provision_request = {"provisionDeviceKey": config.provision_key,  # Provision device key, replace this value with your value from device profile.
                          "provisionDeviceSecret": config.provision_secret,  # Provision device secret, replace this value with your value from device profile.
                          }
+        
+    def __on_disconnect(self, client: Client, userdata, flags, rc, props=None):  # Callback for disconnect
+        self.IS_CONNECTED = False
+        print("Disconnected from ThingsBoard: %s " % str(rc))
 
     def __on_connect(self, client: Client, userdata, flags, rc, props=None):  # Callback for connect
         if rc == 0:
-            print("Connected to ThingsBoard ")
+            print("Connected to ThingsBoard")
+            self.IS_CONNECTED = True
             self.subscribe(self.PROVISION_RESPONSE_TOPIC, qos=1)  # Subscribe to provisioning response topic
         else:
             print("Cannot connect to ThingsBoard: %s" % str(rc))
@@ -77,12 +84,29 @@ class ProvisionClient(Client):
 
     def provision(self):
         print("Connecting to ThingsBoard")
-        self.connect(self._host, self._port, 60)
-        self.loop_start()
-        time.sleep(0.1)
+        try:
+            self.connect(self._host, self._port, 60)
+            self.loop_start()
+        except:
+            print("Failed connecting")
+            exit(1)
+
+        for i in range(0, 3):
+            if self.IS_CONNECTED:
+                break
+            else:
+                time.sleep(1)
+
+        if not self.IS_CONNECTED:
+            print("Not connected. Exiting...")
+            self.loop_stop()
+            exit(1)
+
         self.create_devices()
 
         while len(self.CREDENTIALS) < self.NUMBER_OF_DEVICES:
+            if not self.IS_CONNECTED:
+                break
             time.sleep(1)
 
         self.disconnect()
