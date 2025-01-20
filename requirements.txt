@@ -1,4 +1,4 @@
-locust==2.31.7
+locust==2.32.6
 paho-mqtt==2.1.0
 
 ### pip install -r requirements.txt

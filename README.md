@@ -10,19 +10,19 @@ The "device_generator.py" script is a Phyton script, which creates a number of t
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. [MQTT configuration](#configuration)
-4. [Locust configuration](#locust)
-6. [Customization](#customization)
+3. [MQTT configuration](#mqtt-configuration)
+4. [Locust configuration](#locust-configuration)
+5. [ThingsBoard provisioning](#thingsboard-device-provisioning)
 7. [Results and Reporting](#results-and-reporting)
 8. [Example Scenario](#example-scenario)
 9. [Troubleshooting](#troubleshooting)
 10. [Contributing](#contributing)
 11. [License](#license)
 
-## Installation <a name="installation"></a>
+## Installation {#installation}
 
 - Clone or download the script from the GitHub repository.
-- Ensure you have Python 3.x installed on your system.
+- Ensure you have **Python 3.x** and **pip** installed on your system.
 - Install the required Python libraries using pip:
 
 ```bash
@@ -36,19 +36,20 @@ pip install locust paho-mqtt
 ```
 
 
-## Usage <a name="usage"></a>
+## Usage {#usage}
 
 Follow these steps:
 
-Open a terminal or command prompt.
+1. Open a terminal or command prompt.
 
-Navigate to the directory containing scripts.
+2. Navigate to the directory containing scripts.
 
-Check [MQTT configuration](#configuration) and [locust configuration](#locust)
+3. Check [MQTT configuration](#mqtt-configuration) and [locust configuration](#locust-configuration)
 
-Run **"device_generator.py"** if you need to create test devices. Script will
-prompt for all the required data. Make sure that Thingsboard device profile allows automatic device provisioning.
-I will add a bit more info about the process later.
+4. Create "credentials.py":
+
+Run **"python device_generator.py"** if you need to create test devices. Script will
+prompt for all the required data. Make sure that Thingsboard device profile allows automatic [device provisioning](#thingsboard-device-provisioning).
 
 If you create 2 devices, their ThingsBoard access tokens will be saved to 
 "credentials.py", like this:
@@ -60,7 +61,7 @@ device_tokens = ['5bgOMX328hgLD','Udyz5XvdvmOTvOrD']
 
 otherwise create "credentials.py" file manually like above.
 
-Run locust with configuration stored in "pyproject.toml":
+5. Run locust with configuration stored in "pyproject.toml":
 
 ```bash
 locust
@@ -82,9 +83,11 @@ Configure the number of users (clients) and the hatch rate for your load test.
 
 Start the load test from the web interface.
 
-## MQTT Configuration <a name="configuration"></a>
+## MQTT Configuration {#mqtt-configuration}
 
-MQTT connection configuration is stored in "config.py"
+MQTT connection configuration is stored in "config.py".
+
+If you set port 8883, it will try to set TLS without client certificates. So this is not properly tested yet and it might not work.
 ```
 # Define the MQTT broker address and port
 tb_address = "your.server.com"
@@ -99,7 +102,7 @@ REQUEST_TYPE = 'MQTT'
 PUBLISH_TIMEOUT = 10000
 ```
 
-## Locust configuration <a name="locust"></a>
+## Locust configuration {#locust-configuration}
 
 Locust configuration is stored in "pyproject.toml"
 
@@ -114,22 +117,15 @@ only-summary = 1
 users = 100 # should equal number of devices you are testing
 ```
 
-## Customization <a name="customization"></a>
+## ThingsBoard device provisioning {#profile}
 
-You can customize the script by modifying the following parameters:
+To be able to generate test devices with "device_generator.py" you need to make sure ThingsBoard device profile is set up correctly:
+- Open ThingsBoard **Device profiles**. 
+- Open **Device provisioning** tab.
+- Set "Provisioning strategy" to "Allow to create new devices"
+- Enter or copy "Provision device key" and "Provision device secret" - you will need to enter these two values into "device_generator.py" when requested.
 
-MQTT broker address (broker_address).
-MQTT request type (REQUEST_TYPE).
-Publish timeout (PUBLISH_TIMEOUT).
-Message publishing frequency (wait_time in the TaskSet).
-Running the Tests <a name="running-the-tests"></a>
-Run the script using the locust command as described in the "Usage" section.
-
-Configure the number of clients, hatch rate, and other test parameters via the Locust web interface.
-
-Start the test from the web interface, and the script will simulate MQTT clients publishing messages to the broker.
-
-## Results and Reporting <a name="results-and-reporting"></a>
+## Results and Reporting {#results-and-reporting}
 
 Locust provides real-time performance metrics and reporting through its web interface or terminal output.
 
@@ -137,7 +133,8 @@ You can view various statistics such as response times, request rates, and failu
 
 Generate and save detailed reports for analysis.
 
-## Example Scenario <a name="example-scenario"></a>
+## Example Scenario {#example-scenario}
+
 Here's an example scenario:
 
 You want to test the performance of an MQTT broker under load.
@@ -152,11 +149,14 @@ The script sends MQTT messages to the broker, measuring response times and other
 
 You analyze the results to assess the broker's performance.
 
-## Troubleshooting <a name="troubleshooting"></a>
+## Troubleshooting {#troubleshooting}
+
 * Did you set correct values in "config.py"? 
 
-## Contributing <a name="contributing"></a>
+## Contributing {#contributing}
+
 Contributions to this script are welcome. Please fork the repository, make your changes, and submit a pull request.
 
-## License <a name="license"></a>
+## License {#license}
+
 This script is released under the MIT License.

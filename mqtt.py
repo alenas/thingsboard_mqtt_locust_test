@@ -52,6 +52,9 @@ class MQTTLocust(User):
         self.client.user_data_set(self.unacked_publish)
 
     def on_start(self):
+        # set SSL if required
+        if tb_port == 8883:
+            self.client.tls_set()
         self.client.connect(host=tb_address, port=tb_port, keepalive=60)
         self.client.loop_start()
 
