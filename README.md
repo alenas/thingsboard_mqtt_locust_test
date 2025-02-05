@@ -46,7 +46,9 @@ Follow these steps:
 
 3. Check [MQTT configuration](#mqtt-configuration) and [locust configuration](#locust-configuration)
 
-4. Create "credentials.py":
+4. Check "payload.py" to see what data will be sent to the device.
+
+5. Create "credentials.py":
 
 Run **"python device_generator.py"** if you need to create test devices. Script will
 prompt for all the required data. Make sure that Thingsboard device profile allows automatic [device provisioning](#thingsboard-device-provisioning).
@@ -61,7 +63,7 @@ device_tokens = ['5bgOMX328hgLD','Udyz5XvdvmOTvOrD']
 
 otherwise create "credentials.py" file manually like above.
 
-5. Run locust with configuration stored in "pyproject.toml":
+6. Run locust with configuration stored in "pyproject.toml":
 
 ```bash
 locust
@@ -88,6 +90,9 @@ Start the load test from the web interface.
 MQTT connection configuration is stored in "config.py".
 
 If you set port 8883, it will try to set TLS without client certificates. So this is not properly tested yet and it might not work.
+
+UDP connections (mqtt_qos=0) do not work yet.
+
 ```
 # Define the MQTT broker address and port
 tb_address = "your.server.com"

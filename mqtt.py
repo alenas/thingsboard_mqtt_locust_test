@@ -21,7 +21,7 @@ def get_client_id():
 
 @staticmethod
 def time_delta(t1, t2):
-	return int((t2 - t1) * 1000)
+    return int((t2 - t1) * 1000)
 
 # Define short message
 class Message(object):
