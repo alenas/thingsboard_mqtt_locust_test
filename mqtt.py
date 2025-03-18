@@ -6,9 +6,16 @@ from config import REQUEST_TYPE, mqtt_topic, mqtt_qos, tb_address, tb_port, PUBL
 from payload import PayloadGenerator
 from credentials import device_tokens
 import json
+import statistics
+from typing import Any
 
 # Initialize a global variable to keep track of MQTT client count
 COUNTClient = 0
+
+# When locust finishes - send statistics to ThingsBoard
+@events.quit.add_listener
+def quit(exit_code: int, **kwargs: Any) -> None:
+    statistics.main(False)
 
 @staticmethod
 def get_client_id():
@@ -121,6 +128,6 @@ class MQTTLocust(User):
                 response_length=message.length
             )
 
-# if launched directly, e.g. "python3 debugging.py", not "locust -f debugging.py"
+# if launched directly, e.g. "python3 mqtt.py", not "locust -f mqtt.py"
 if __name__ == "__main__":
     run_single_user(MQTTLocust)

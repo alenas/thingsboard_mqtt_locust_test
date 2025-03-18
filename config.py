@@ -13,3 +13,6 @@ mqtt_qos = 1
 # Define constants for request type and publish timeout
 REQUEST_TYPE = 'MQTT'
 PUBLISH_TIMEOUT = 10000
+
+# Specify statistics url, if you want to send data to ThingsBoard or other service
+statistics_url = ''
