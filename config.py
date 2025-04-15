@@ -3,8 +3,8 @@
 # or set device access tokens manually in credentials.py file
 
 # Define the MQTT broker address
-tb_address = "age.dev.telemetrak.net"
-tb_port = 1883
+tb_address = "mqtt.yourserver.com"
+tb_port = 8883
 
 # Define the MQTT topic to subscribe to
 mqtt_topic = "v1/telemetry/gps"
@@ -15,4 +15,4 @@ REQUEST_TYPE = 'MQTT'
 PUBLISH_TIMEOUT = 10000
 
 # Specify statistics url, if you want to send data to ThingsBoard or other service
-statistics_url = ''
+statistics_url = 'https://yourserver.com/statistics'

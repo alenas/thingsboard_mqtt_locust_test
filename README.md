@@ -63,10 +63,18 @@ device_tokens = ['5bgOMX328hgLD','Udyz5XvdvmOTvOrD']
 
 otherwise create "credentials.py" file manually like above.
 
-6. Run locust with configuration stored in "pyproject.toml":
+6. Run locust with default configuration stored in "locust.conf":
 
 ```bash
 locust
+```
+
+or 
+
+Run locust with configuration stored in "stress_test.conf":
+
+```bash
+locust --config stress_test.conf
 ```
 
 or
@@ -105,21 +113,24 @@ mqtt_qos = 1
 # Define constants for request type and publish timeout
 REQUEST_TYPE = 'MQTT'
 PUBLISH_TIMEOUT = 10000
+
+# Specify statistics url, if you want to send data to ThingsBoard or other service
+statistics_url = ''
 ```
 
 ## Locust configuration {#locust-configuration}
 
-Locust configuration is stored in "pyproject.toml"
+Default Locust configuration is stored in "locust.conf"
 
 ```
-[tool.locust]
-locustfile = "mqtt.py"
+locustfile = mqtt.py
 headless = true
 expect-workers = 1
 spawn-rate = 1
-run-time = "1m"
+run-time = 1m
 only-summary = 1
 users = 100 # should equal number of devices you are testing
+csv = results # to output to csv so it can send statistics to URL
 ```
 
 ## ThingsBoard device provisioning {#profile}
