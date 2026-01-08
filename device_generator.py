@@ -86,7 +86,7 @@ class ProvisionClient(Client):
         print("Connecting to ThingsBoard")
         # set SSL if required
         if self._port == 8883:
-            self.client.tls_set()
+            self.tls_set()
         try:
             self.connect(self._host, self._port, 60)
             self.loop_start()

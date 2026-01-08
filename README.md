@@ -26,13 +26,13 @@ The "device_generator.py" script is a Phyton script, which creates a number of t
 - Install the required Python libraries using pip:
 
 ```bash
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 or
 
 ```bash
-pip install locust paho-mqtt
+pip install locust paho-mqtt pandas
 ```
 
 
